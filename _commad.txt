@@ -1,0 +1,13 @@
+# Entity Framework Core Migration Commands
+
+# To add a new migration:
+dotnet ef migrations add <MigrationName> --project LearnCraft.Infrastructure --startup-project LearnCraft.API
+
+# To update the database:
+dotnet ef database update --project LearnCraft.Infrastructure --startup-project LearnCraft.API
+
+# To remove the last migration:
+dotnet ef migrations remove --project LearnCraft.Infrastructure --startup-project LearnCraft.API
+
+# To list migrations:
+dotnet ef migrations list --project LearnCraft.Infrastructure --startup-project LearnCraft.API

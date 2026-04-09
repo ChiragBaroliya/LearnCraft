@@ -3,9 +3,11 @@ using LearnCraft.Application.Features.Enrollments.Commands.DeleteEnrollment;
 using LearnCraft.Application.Features.Enrollments.Commands.EnrollUser;
 using LearnCraft.Application.Features.Enrollments.Queries.GetEnrollmentById;
 using LearnCraft.Application.Features.Enrollments.Queries.GetEnrollments;
+using LearnCraft.Application.Features.Enrollments.Queries.GetMyEnrollments;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LearnCraft.API.Controllers;
 
@@ -35,6 +37,26 @@ public sealed class EnrollmentsController : ControllerBase
         }
 
         return Ok(ResponseDto<PagedResult<EnrollmentResponse>>.Success(result.Value));
+    }
+
+    [HttpGet("my")]
+    [Authorize]
+    public async Task<IActionResult> GetMyEnrollments(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) 
+        {
+            return Unauthorized(ResponseDto<object>.Failure("User ID not found in token.", StatusCodes.Status401Unauthorized));
+        }
+
+        var result = await _sender.Send(new GetMyEnrollmentsQuery(Guid.Parse(userId)), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(ResponseDto<List<MyEnrollmentResponse>>.Failure(result.Error.Message));
+        }
+
+        return Ok(ResponseDto<List<MyEnrollmentResponse>>.Success(result.Value));
     }
 
     [HttpGet("{id:guid}")]

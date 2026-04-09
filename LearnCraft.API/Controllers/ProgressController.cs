@@ -1,11 +1,14 @@
 using LearnCraft.Application.Common.Models;
 using LearnCraft.Application.Features.Progress.Commands.CompleteLesson;
 using LearnCraft.Application.Features.Progress.Commands.DeleteProgress;
+using LearnCraft.Application.Features.Progress.Commands.UpdateProgress;
+using LearnCraft.Application.Features.Progress.Queries.GetCourseProgress;
 using LearnCraft.Application.Features.Progress.Queries.GetProgress;
 using LearnCraft.Application.Features.Progress.Queries.GetProgressById;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LearnCraft.API.Controllers;
 
@@ -35,6 +38,40 @@ public sealed class ProgressController : ControllerBase
         }
 
         return Ok(ResponseDto<PagedResult<ProgressResponse>>.Success(result.Value));
+    }
+
+    [HttpGet("course/{courseId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> GetCourseProgress(Guid courseId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) 
+        {
+            return Unauthorized(ResponseDto<object>.Failure("User ID not found in token.", StatusCodes.Status401Unauthorized));
+        }
+
+        var result = await _sender.Send(new GetCourseProgressQuery(courseId, Guid.Parse(userId)), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(ResponseDto<CourseProgressResponse>.Failure(result.Error.Message));
+        }
+
+        return Ok(ResponseDto<CourseProgressResponse>.Success(result.Value));
+    }
+
+    [HttpPost("track")]
+    [Authorize]
+    public async Task<IActionResult> TrackProgress([FromBody] UpdateProgressCommand command, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(ResponseDto<object>.Failure(result.Error.Message));
+        }
+
+        return Ok(ResponseDto<object>.Success(null, "Progress tracked successfully"));
     }
 
     [HttpGet("{id:guid}")]

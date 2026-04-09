@@ -11,4 +11,6 @@ public record LessonResponse(
     string ContentUrl,
     string ContentType,
     int SequenceNumber,
-    Guid CourseId);
+    Guid CourseId,
+    Guid? NextLessonId = null,
+    Guid? PreviousLessonId = null);

@@ -1,19 +1,18 @@
 using LearnCraft.Application.Interfaces.Data;
 using LearnCraft.Application.Interfaces.Repositories;
-using LearnCraft.Domain.Entities;
 using LearnCraft.Domain.Primitives;
 using MediatR;
 
-namespace LearnCraft.Application.Features.Progress.Commands.CompleteLesson;
+namespace LearnCraft.Application.Features.Progress.Commands.UpdateProgress;
 
-public sealed class CompleteLessonCommandHandler : IRequestHandler<CompleteLessonCommand, Result>
+public sealed class UpdateProgressCommandHandler : IRequestHandler<UpdateProgressCommand, Result>
 {
     private readonly IProgressRepository _progressRepository;
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly ILessonRepository _lessonRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CompleteLessonCommandHandler(
+    public UpdateProgressCommandHandler(
         IProgressRepository progressRepository, 
         IEnrollmentRepository enrollmentRepository,
         ILessonRepository lessonRepository,
@@ -25,7 +24,7 @@ public sealed class CompleteLessonCommandHandler : IRequestHandler<CompleteLesso
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result> Handle(CompleteLessonCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateProgressCommand request, CancellationToken cancellationToken)
     {
         var enrollment = await _enrollmentRepository.GetByIdAsync(request.EnrollmentId, cancellationToken);
         if (enrollment is null) return Result.Failure(new Error("Enrollment.NotFound", "Enrollment not found."));
@@ -42,8 +41,10 @@ public sealed class CompleteLessonCommandHandler : IRequestHandler<CompleteLesso
             progress = LearnCraft.Domain.Entities.Progress.Create(request.EnrollmentId, request.LessonId);
             _progressRepository.Add(progress);
         }
-        
-        progress.MarkAsCompleted();
+        else
+        {
+            progress.UpdateLastAccessed();
+        }
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

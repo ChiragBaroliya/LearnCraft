@@ -2,7 +2,9 @@ using LearnCraft.Application.Common.Models;
 using LearnCraft.Application.Features.Courses.Commands.CreateCourse;
 using LearnCraft.Application.Features.Courses.Commands.DeleteCourse;
 using LearnCraft.Application.Features.Courses.Queries.GetCourseById;
+using LearnCraft.Application.Features.Courses.Queries.GetCourseLessons;
 using LearnCraft.Application.Features.Courses.Queries.GetCourses;
+using LearnCraft.Application.Features.Lessons.Queries.GetLessonById;
 using LearnCraft.Domain.Primitives;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -50,6 +52,19 @@ public sealed class CoursesController : ControllerBase
         }
 
         return Ok(ResponseDto<CourseDetailsResponse>.Success(result.Value));
+    }
+
+    [HttpGet("{courseId:guid}/lessons")]
+    public async Task<IActionResult> GetCourseLessons(Guid courseId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetCourseLessonsQuery(courseId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(ResponseDto<List<LessonResponse>>.Failure(result.Error.Message));
+        }
+
+        return Ok(ResponseDto<List<LessonResponse>>.Success(result.Value));
     }
 
     [HttpPost]
