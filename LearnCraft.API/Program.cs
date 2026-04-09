@@ -14,6 +14,7 @@ using LearnCraft.Application.Interfaces.Repositories;
 using LearnCraft.Application.Interfaces.Data;
 using LearnCraft.Infrastructure.Data.Repositories;
 using LearnCraft.Application.Interfaces.Authentication;
+using LearnCraft.Application.Common.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,16 +83,46 @@ builder.Services.AddValidatorsFromAssembly(typeof(LearnCraft.Application.Data.IA
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+                
+                var response = ResponseDto<object>.Failure(
+                    "You are not authorized to access this resource.", 
+                    StatusCodes.Status401Unauthorized);
+                
+                await context.Response.WriteAsJsonAsync(response);
+            },
+            OnForbidden = async context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                context.Response.ContentType = "application/json";
+
+                var response = ResponseDto<object>.Failure(
+                    "You do not have permission to perform this action.", 
+                    StatusCodes.Status403Forbidden);
+
+                await context.Response.WriteAsJsonAsync(response);
+            }
+        };
     });
 
 builder.Services.AddAuthorization();

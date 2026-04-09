@@ -28,6 +28,21 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return await _context.Set<T>().Where(predicate).ToListAsync(cancellationToken);
     }
 
+    public virtual async Task<(List<T> Items, int TotalCount)> GetPagedAsync(
+        int pageNumber, 
+        int pageSize, 
+        CancellationToken cancellationToken = default)
+    {
+        var totalCount = await _context.Set<T>().CountAsync(cancellationToken);
+        
+        var items = await _context.Set<T>()
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
     public virtual void Add(T entity)
     {
         _context.Set<T>().Add(entity);

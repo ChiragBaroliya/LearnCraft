@@ -1,27 +1,30 @@
-using LearnCraft.Application.Data;
+using LearnCraft.Application.Common.Models;
+using LearnCraft.Application.Interfaces.Repositories;
 using LearnCraft.Domain.Primitives;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace LearnCraft.Application.Features.Courses.Queries.GetCourses;
 
 public sealed class GetCoursesQueryHandler 
-    : IRequestHandler<GetCoursesQuery, Result<List<CourseResponse>>>
+    : IRequestHandler<GetCoursesQuery, Result<PagedResult<CourseResponse>>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly ICourseRepository _courseRepository;
 
-    public GetCoursesQueryHandler(IApplicationDbContext context)
+    public GetCoursesQueryHandler(ICourseRepository courseRepository)
     {
-        _context = context;
+        _courseRepository = courseRepository;
     }
 
-    public async Task<Result<List<CourseResponse>>> Handle(
+    public async Task<Result<PagedResult<CourseResponse>>> Handle(
         GetCoursesQuery request, 
         CancellationToken cancellationToken)
     {
-        var courses = await _context.Courses
-            .AsNoTracking()
-            .Where(c => !c.IsDeleted)
+        var (items, totalCount) = await _courseRepository.GetPagedAsync(
+            request.PageNumber, 
+            request.PageSize, 
+            cancellationToken);
+
+        var courseResponses = items
             .Select(c => new CourseResponse(
                 c.Id,
                 c.Title,
@@ -30,8 +33,12 @@ public sealed class GetCoursesQueryHandler
                 c.Category,
                 c.ThumbnailUrl,
                 c.InstructorId))
-            .ToListAsync(cancellationToken);
+            .ToList();
 
-        return courses;
+        return PagedResult<CourseResponse>.Create(
+            courseResponses, 
+            totalCount, 
+            request.PageNumber, 
+            request.PageSize);
     }
 }
