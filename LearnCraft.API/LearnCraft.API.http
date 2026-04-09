@@ -1,0 +1,6 @@
+@LearnCraft.API_HostAddress = http://localhost:5186
+
+GET {{LearnCraft.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
