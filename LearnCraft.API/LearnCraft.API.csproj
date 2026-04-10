@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.13" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.1.13" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -20,6 +22,10 @@
   <ItemGroup>
     <ProjectReference Include="..\LearnCraft.Application\LearnCraft.Application.csproj" />
     <ProjectReference Include="..\LearnCraft.Infrastructure\LearnCraft.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

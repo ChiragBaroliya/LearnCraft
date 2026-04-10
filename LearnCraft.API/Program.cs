@@ -1,20 +1,25 @@
-using System.Text;
 using FluentValidation;
 using LearnCraft.API.Middleware;
 using LearnCraft.Application.Behaviors;
+using LearnCraft.Application.Common.Models;
 using LearnCraft.Application.Data;
+using LearnCraft.Application.Interfaces.Authentication;
+using LearnCraft.Application.Interfaces.Data;
+using LearnCraft.Application.Interfaces.Repositories;
 using LearnCraft.Infrastructure.Authentication;
 using LearnCraft.Infrastructure.Data;
+using LearnCraft.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using LearnCraft.Application.Interfaces.Repositories;
-using LearnCraft.Application.Interfaces.Data;
-using LearnCraft.Infrastructure.Data.Repositories;
-using LearnCraft.Application.Interfaces.Authentication;
-using LearnCraft.Application.Common.Models;
+using System.Text;
+using LearnCraft.API.GraphQL.Courses;
+using LearnCraft.API.GraphQL.Enrollments;
+using LearnCraft.API.GraphQL.Lessons;
+using LearnCraft.API.GraphQL.Progress;
+using LearnCraft.API.GraphQL.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +56,22 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType(d => d.Name("Query"))
+    .AddTypeExtension<CourseQueries>()
+    .AddTypeExtension<EnrollmentQueries>()
+    .AddTypeExtension<LessonQueries>()
+    .AddTypeExtension<ProgressQueries>()
+    .AddTypeExtension<UserQueries>()
+    .AddMutationType(d => d.Name("Mutation"))
+    .AddTypeExtension<CourseMutations>()
+    .AddTypeExtension<EnrollmentMutations>()
+    .AddTypeExtension<LessonMutations>()
+    .AddTypeExtension<ProgressMutations>()
+    .AddTypeExtension<UserMutations>()
+    .AddAuthorization();
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -153,8 +174,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => Results.Redirect("/swagger"));
+app.MapGet("/", () => Results.Redirect("/graphql"));
 
 app.MapControllers();
+app.MapGraphQL();
 
 app.Run();
