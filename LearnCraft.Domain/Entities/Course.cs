@@ -28,6 +28,7 @@ public sealed class Course : Entity
     public string Category { get; private set; } = string.Empty;
     public string ThumbnailUrl { get; private set; } = string.Empty;
     public DateTime CreatedAtUtc { get; private set; }
+    public Enums.CourseStatus Status { get; private set; }
     public bool IsDeleted { get; private set; }
 
     public IReadOnlyCollection<Lesson> Lessons => _lessons.AsReadOnly();
@@ -35,7 +36,23 @@ public sealed class Course : Entity
 
     public static Course Create(Guid instructorId, string title, string description, decimal price, string category, string thumbnailUrl)
     {
-        return new Course(Guid.NewGuid(), instructorId, title, description, price, category, thumbnailUrl);
+        var course = new Course(Guid.NewGuid(), instructorId, title, description, price, category, thumbnailUrl);
+        course.Status = Enums.CourseStatus.Draft;
+        return course;
+    }
+
+    public void Update(string title, string description, decimal price, string category, string thumbnailUrl)
+    {
+        Title = title;
+        Description = description;
+        Price = price;
+        Category = category;
+        ThumbnailUrl = thumbnailUrl;
+    }
+
+    public void UpdateStatus(Enums.CourseStatus status)
+    {
+        Status = status;
     }
 
     public void AddLesson(string title, string contentUrl, int sequenceNumber, Enums.ContentType contentType)

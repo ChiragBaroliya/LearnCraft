@@ -27,4 +27,17 @@ public sealed class Lesson : Entity
     {
         return new Lesson(Guid.NewGuid(), courseId, title, contentUrl, sequenceNumber, contentType);
     }
+
+    public void Update(string title, string contentUrl, ContentType contentType)
+    {
+        Title = title;
+        ContentUrl = contentUrl;
+        ContentType = contentType;
+    }
+
+    public void UpdateSequence(int sequenceNumber)
+    {
+        SequenceNumber = sequenceNumber;
+    }
 }
+

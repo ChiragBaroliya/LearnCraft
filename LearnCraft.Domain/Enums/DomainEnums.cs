@@ -12,3 +12,11 @@ public enum ContentType
     Video = 0,
     Document = 1
 }
+
+public enum CourseStatus
+{
+    Draft = 0,
+    Published = 1,
+    Archived = 2
+}
+

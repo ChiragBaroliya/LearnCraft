@@ -1,6 +1,9 @@
 using HotChocolate.Authorization;
 using LearnCraft.Application.Features.Users.Commands.DeleteUser;
 using LearnCraft.Application.Features.Users.Commands.RegisterUser;
+using LearnCraft.Application.Features.Users.Commands.UpdateProfile;
+using LearnCraft.Application.Features.Users.Commands.ChangePassword;
+using LearnCraft.Application.Features.Users.Commands.AssignRole;
 using LearnCraft.Application.Features.Users.Queries.Login;
 using MediatR;
 
@@ -31,6 +34,45 @@ public sealed class UserMutations
         }
 
         return result.Value;
+    }
+
+    [Authorize]
+    public async Task<string> UpdateProfile([Service] ISender sender, UpdateProfileCommand command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new Exception(result.Error.Message);
+        }
+
+        return "Profile updated successfully.";
+    }
+
+    [Authorize]
+    public async Task<string> ChangePassword([Service] ISender sender, ChangePasswordCommand command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new Exception(result.Error.Message);
+        }
+
+        return "Password changed successfully.";
+    }
+
+    [Authorize(Roles = new[] { "Admin" })]
+    public async Task<string> AssignRole([Service] ISender sender, AssignRoleCommand command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new Exception(result.Error.Message);
+        }
+
+        return "Role assigned successfully.";
     }
 
     [Authorize(Roles = new[] { "Admin" })]

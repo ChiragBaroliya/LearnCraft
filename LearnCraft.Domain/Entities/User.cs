@@ -33,4 +33,22 @@ public sealed class User : Entity
     {
         return new User(Guid.NewGuid(), firstName, lastName, email, passwordHash, role);
     }
+
+    public void UpdateProfile(string firstName, string lastName, string email)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+    }
+
+    public void UpdatePassword(string passwordHash)
+    {
+        PasswordHash = passwordHash;
+    }
+
+    public void UpdateRole(UserRole role)
+    {
+        Role = role;
+    }
 }
+

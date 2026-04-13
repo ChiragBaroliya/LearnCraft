@@ -2,6 +2,8 @@ using LearnCraft.Application.Common.Models;
 using LearnCraft.Application.Features.Progress.Queries.GetCourseProgress;
 using LearnCraft.Application.Features.Progress.Queries.GetProgress;
 using LearnCraft.Application.Features.Progress.Queries.GetProgressById;
+using LearnCraft.Application.Features.Lessons.Queries.GetResumeLesson;
+using LearnCraft.Application.Features.Lessons.Queries.GetLessonById;
 using MediatR;
 using System.Security.Claims;
 using HotChocolate.Authorization;
@@ -41,6 +43,29 @@ public sealed class ProgressQueries
         }
 
         var result = await sender.Send(new GetCourseProgressQuery(courseId, userId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new Exception(result.Error.Message);
+        }
+
+        return result.Value;
+    }
+
+    [Authorize]
+    public async Task<LessonResponse> GetResumeLesson(
+        [Service] ISender sender,
+        ClaimsPrincipal claimsPrincipal,
+        Guid courseId,
+        CancellationToken cancellationToken)
+    {
+        var userIdString = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            throw new Exception("User ID not found in token.");
+        }
+
+        var result = await sender.Send(new GetResumeLessonQuery(courseId, userId), cancellationToken);
 
         if (result.IsFailure)
         {

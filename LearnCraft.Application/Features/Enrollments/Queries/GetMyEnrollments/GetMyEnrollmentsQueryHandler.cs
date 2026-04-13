@@ -1,3 +1,4 @@
+using LearnCraft.Application.Features.Courses.Queries.GetCourses;
 using LearnCraft.Application.Interfaces.Repositories;
 using LearnCraft.Domain.Primitives;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace LearnCraft.Application.Features.Enrollments.Queries.GetMyEnrollments;
 
 public sealed class GetMyEnrollmentsQueryHandler 
-    : IRequestHandler<GetMyEnrollmentsQuery, Result<List<MyEnrollmentResponse>>>
+    : IRequestHandler<GetMyEnrollmentsQuery, Result<List<CourseResponse>>>
 {
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly ICourseRepository _courseRepository;
@@ -18,32 +19,24 @@ public sealed class GetMyEnrollmentsQueryHandler
         _courseRepository = courseRepository;
     }
 
-    public async Task<Result<List<MyEnrollmentResponse>>> Handle(
+    public async Task<Result<List<CourseResponse>>> Handle(
         GetMyEnrollmentsQuery request, 
         CancellationToken cancellationToken)
     {
-        var enrollments = await _enrollmentRepository.FindAsync(
-            e => e.UserId == request.UserId, 
-            cancellationToken);
-
-        var courseIds = enrollments.Select(e => e.CourseId).Distinct().ToList();
+        var enrollments = await _enrollmentRepository.FindAsync(e => e.UserId == request.UserId, cancellationToken);
         
-        // This is a naive way for a small project. For large projects, a specific join query is better.
-        var courses = await _courseRepository.FindAsync(
-            c => courseIds.Contains(c.Id), 
-            cancellationToken);
+        var courseIds = enrollments.Select(e => e.CourseId).ToList();
+        
+        var courses = await _courseRepository.FindAsync(c => courseIds.Contains(c.Id), cancellationToken);
 
-        var response = enrollments
-            .Select(e => {
-                var course = courses.FirstOrDefault(c => c.Id == e.CourseId);
-                return new MyEnrollmentResponse(
-                    e.Id,
-                    e.CourseId,
-                    course?.Title ?? "Unknown Course",
-                    course?.ThumbnailUrl ?? string.Empty,
-                    e.EnrolledAtUtc);
-            })
-            .ToList();
+        var response = courses.Select(c => new CourseResponse(
+            c.Id,
+            c.Title,
+            c.Description,
+            c.Price,
+            c.Category,
+            c.ThumbnailUrl,
+            c.InstructorId)).ToList();
 
         return response;
     }

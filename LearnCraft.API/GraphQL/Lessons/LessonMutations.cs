@@ -1,5 +1,7 @@
 using LearnCraft.Application.Features.Lessons.Commands.AddLesson;
 using LearnCraft.Application.Features.Lessons.Commands.DeleteLesson;
+using LearnCraft.Application.Features.Lessons.Commands.UpdateLesson;
+using LearnCraft.Application.Features.Lessons.Commands.ReorderLessons;
 using MediatR;
 using HotChocolate.Authorization;
 
@@ -22,6 +24,38 @@ public sealed class LessonMutations
         }
 
         return result.Value;
+    }
+
+    [Authorize(Roles = new[] { "Instructor", "Admin" })]
+    public async Task<Guid> UpdateLesson(
+        [Service] ISender sender,
+        UpdateLessonCommand command,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new Exception(result.Error.Message);
+        }
+
+        return result.Value;
+    }
+
+    [Authorize(Roles = new[] { "Instructor", "Admin" })]
+    public async Task<string> ReorderLessons(
+        [Service] ISender sender,
+        ReorderLessonsCommand command,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new Exception(result.Error.Message);
+        }
+
+        return "Lessons reordered successfully.";
     }
 
     [Authorize(Roles = new[] { "Instructor", "Admin" })]

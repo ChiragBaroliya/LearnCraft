@@ -2,6 +2,7 @@ using LearnCraft.Application.Common.Models;
 using LearnCraft.Application.Features.Enrollments.Queries.GetEnrollmentById;
 using LearnCraft.Application.Features.Enrollments.Queries.GetEnrollments;
 using LearnCraft.Application.Features.Enrollments.Queries.GetMyEnrollments;
+using LearnCraft.Application.Features.Courses.Queries.GetCourses;
 using MediatR;
 using System.Security.Claims;
 using HotChocolate.Authorization;
@@ -29,7 +30,7 @@ public sealed class EnrollmentQueries
     }
 
     [Authorize]
-    public async Task<List<MyEnrollmentResponse>> GetMyEnrollments(
+    public async Task<List<CourseResponse>> GetMyEnrollments(
         [Service] ISender sender,
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken)
