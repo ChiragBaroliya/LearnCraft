@@ -1,28 +1,29 @@
 # LearnCraft 🚀
 
-LearnCraft is a scalable, production-ready Learning Management System (LMS) backend built with **.NET 10** following **Clean Architecture** principles.
+LearnCraft is a scalable, production-ready Learning Management System (LMS) backend built with **.NET 10** following **Clean Architecture** principles. The platform is powered by a high-performance **GraphQL** API.
 
 ## 🏗️ Architecture
 
-The project is structured into four main layers:
+The project follows Clean Architecture and is organized into four main layers:
 
 1.  **Domain**: Core business logic, entities, and value objects.
 2.  **Application**: Application logic using MediatR for CQRS (Command Query Responsibility Segregation).
 3.  **Infrastructure**: Data persistence (EF Core + PostgreSQL), authentication (JWT), and external services.
-4.  **API**: RESTful endpoints and middleware.
+4.  **API (GraphQL)**: A modular API layer using **HotChocolate Type Extensions**. The schema is split into feature-based modules (Courses, Lessons, Enrollments, Progress, Users) for maximum maintainability.
 
 ## ✨ Features
 
--   **User Authentication**: Secure Login and Registration using JWT tokens.
-    -   **Password Hashing**: Industry-standard **BCrypt** algorithm for secure password storage.
+-   **GraphQL Powered**: Flexible and efficient data fetching with a single `/graphql` endpoint.
+-   **Modular Design**: Type Extensions allow features to be 100% independent.
+-   **User Authentication**: Secure Login and Registration using JWT tokens and GraphQL mutations.
 -   **Course Management**: Create and manage courses with multiple lessons.
--   **Content Support**: Support for both Video and Document content types.
 -   **Enrollment System**: Track student progress and course enrollments.
--   **Clean & Scalable**: Decoupled architecture using the Repository and Unit of Work patterns.
+-   **Clean & Scalable**: Decoupled architecture using the Repository, Unit of Work, and CQRS patterns.
 
 ## 🛠️ Tech Stack
 
 -   **Runtime**: .NET 10
+-   **API Layer**: HotChocolate (GraphQL)
 -   **Database**: PostgreSQL
 -   **ORM**: Entity Framework Core
 -   **Communication**: MediatR (CQRS)
@@ -46,21 +47,20 @@ The project is structured into four main layers:
     ```
 
 2.  **Configure Database**:
-    Update the connection string in `LearnCraft.API/appsettings.json`:
-    ```json
-    "ConnectionStrings": {
-      "Database": "Host=localhost;Database=LearnCraftDb;Username=postgres;Password=yourpassword"
-    }
-    ```
+    Update the connection string in `LearnCraft.API/appsettings.json`.
 
 3.  **Run Migrations & Seed**:
-    The application is configured to automatically apply migrations and seed initial data on startup.
+    The application automatically applies migrations and seeds initial data (Admin/Instructor users) on startup.
 
 4.  **Run the application**:
     ```bash
     dotnet run --project LearnCraft.API
     ```
-    The API will be available at `https://localhost:5001` (or the port specified in `launchSettings.json`). You can access the Swagger UI at `/swagger`.
+
+### Accessing the API
+
+-   **Banana Cake Pop (GraphQL IDE)**: Access `https://localhost:5001/graphql` to explore the schema and test queries.
+-   **Swagger UI**: Access `https://localhost:5001/swagger` for any remaining utility endpoints.
 
 ## 🧪 Testing
 
