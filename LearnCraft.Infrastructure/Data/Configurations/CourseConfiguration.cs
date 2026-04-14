@@ -27,6 +27,10 @@ public sealed class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.ThumbnailUrl)
             .HasMaxLength(500);
 
+        builder.Property(c => c.Status)
+            .IsRequired();
+
+
         builder.HasMany(c => c.Lessons)
             .WithOne()
             .HasForeignKey(l => l.CourseId)
