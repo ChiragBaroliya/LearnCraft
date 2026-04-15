@@ -120,6 +120,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());   
+});
+
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -140,9 +151,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+
+// Use CORS before authentication/authorization
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -151,5 +166,6 @@ app.MapGet("/", () => Results.Redirect("/graphql"));
 
 app.MapControllers();
 app.MapGraphQL();
+app.UseCors("AllowFrontend");
 
 app.Run();

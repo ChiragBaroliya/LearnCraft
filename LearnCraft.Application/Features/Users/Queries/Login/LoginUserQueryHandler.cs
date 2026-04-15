@@ -20,6 +20,7 @@ public sealed class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Resu
 
     public async Task<Result<string>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
     {
+
         var users = await _userRepository.FindAsync(x => x.Email == request.Email, cancellationToken);
         var user = users.FirstOrDefault();
 
@@ -28,10 +29,9 @@ public sealed class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Resu
             return Result.Failure<string>(new Error("User.NotFound", "Invalid email or password."));
         }
 
-        // Ideally, check password hash here. For simplicity in this demo seeder:
-        if (!_passwordHasher.Verify(request.Password, user.PasswordHash)) 
+        if (!_passwordHasher.Verify(request.Password, user.PasswordHash))
         {
-             return Result.Failure<string>(new Error("User.InvalidPassword", "Invalid email or password."));
+            return Result.Failure<string>(new Error("User.InvalidPassword", "Invalid email or password."));
         }
 
         var token = _jwtProvider.Generate(user);
