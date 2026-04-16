@@ -1,4 +1,10 @@
 using FluentValidation;
+using HotChocolate.AspNetCore;
+using LearnCraft.API.GraphQL.Courses;
+using LearnCraft.API.GraphQL.Enrollments;
+using LearnCraft.API.GraphQL.Lessons;
+using LearnCraft.API.GraphQL.Progress;
+using LearnCraft.API.GraphQL.Users;
 using LearnCraft.API.Middleware;
 using LearnCraft.Application.Behaviors;
 using LearnCraft.Application.Common.Models;
@@ -15,11 +21,6 @@ using Microsoft.IdentityModel.Tokens;
 // using Microsoft.OpenApi.Models; // Removed for Swagger removal
 using Serilog;
 using System.Text;
-using LearnCraft.API.GraphQL.Courses;
-using LearnCraft.API.GraphQL.Enrollments;
-using LearnCraft.API.GraphQL.Lessons;
-using LearnCraft.API.GraphQL.Progress;
-using LearnCraft.API.GraphQL.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -156,7 +157,6 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
-// Use CORS before authentication/authorization
 app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
@@ -165,7 +165,12 @@ app.UseAuthorization();
 app.MapGet("/", () => Results.Redirect("/graphql"));
 
 app.MapControllers();
-app.MapGraphQL();
-app.UseCors("AllowFrontend");
+
+app.UseRouting();
+app.MapGraphQL("/graphql").WithOptions(new GraphQLServerOptions
+{
+    EnableSchemaRequests = true,
+    Tool = { Enable = true }
+});
 
 app.Run();
