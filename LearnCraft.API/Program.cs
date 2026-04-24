@@ -22,7 +22,11 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Application Insights
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
 // Serilog Setup
 builder.Host.UseSerilog((context, loggerConfiguration) => 
