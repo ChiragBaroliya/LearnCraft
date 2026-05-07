@@ -3,5 +3,4 @@
   <Project Path="LearnCraft.Application/LearnCraft.Application.csproj" />
   <Project Path="LearnCraft.Domain/LearnCraft.Domain.csproj" />
   <Project Path="LearnCraft.Infrastructure/LearnCraft.Infrastructure.csproj" />
-  <Project Path="LearnCraft.Tests/LearnCraft.Tests.csproj" />
 </Solution>

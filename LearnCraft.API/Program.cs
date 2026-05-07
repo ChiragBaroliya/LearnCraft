@@ -54,8 +54,11 @@ builder.Services
     .AddAuthorization();
 
 // Database
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 
 builder.Services.AddScoped<IApplicationDbContext>(sp => 
     sp.GetRequiredService<ApplicationDbContext>());
@@ -190,4 +193,5 @@ catch (Exception ex)
 {
     Log.Logger.Error(ex, "Unhandled exception occurred while running the application.");
 }
+
 
