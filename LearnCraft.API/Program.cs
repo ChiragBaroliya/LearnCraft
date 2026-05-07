@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 // using Microsoft.OpenApi.Models; // Removed for Swagger removal
 using Serilog;
+using Serilog.Core;
 using System.Text;
 
 
@@ -154,6 +155,7 @@ if (app.Environment.IsDevelopment())
     // Swagger middleware removed
 }
 
+app.UseDeveloperExceptionPage();
 app.UseSerilogRequestLogging();
 
 
@@ -166,7 +168,10 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => Results.Redirect("/graphql"));
+app.MapGet("/", (ILogger<Program> logger) => {
+    logger.LogError("Root endpoint accessed, redirecting to /graphql");
+    return Results.Redirect("/graphql");
+});
 
 app.MapControllers();
 
@@ -177,4 +182,12 @@ app.MapGraphQL("/graphql").WithOptions(new GraphQLServerOptions
     Tool = { Enable = true }
 });
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Logger.Error(ex, "Unhandled exception occurred while running the application.");
+}
+

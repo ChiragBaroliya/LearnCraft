@@ -6,7 +6,8 @@ import {
   BsCurrencyDollar,
   BsPersonPlus,
   BsCheckCircle,
-  BsPencil
+  BsPencil,
+  BsBarChart
 } from 'react-icons/bs';
 
 const Dashboard: React.FC = () => {

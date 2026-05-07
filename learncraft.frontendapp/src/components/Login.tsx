@@ -54,7 +54,7 @@ const Login: React.FC = () => {
               <input type="checkbox" className="form-check-input" id="rememberMe" />
               <label className="form-check-label small text-secondary" htmlFor="rememberMe">Remember me</label>
             </div>
-            <a href="#" className="small text-decoration-none" style={{ color: '#764ba2', fontWeight: 600 }}>Forgot password?</a>
+            <button type="button" className="small text-decoration-none" style={{ color: '#764ba2', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>Forgot password?</button>
           </div>
           <button 
             type="submit" 
@@ -72,7 +72,7 @@ const Login: React.FC = () => {
         
         <div className="mt-5 text-center">
           <p className="text-secondary small">
-            Don't have an account? <a href="#" className="text-decoration-none fw-bold" style={{ color: '#764ba2' }}>Register</a>
+            Don't have an account? <button type="button" className="text-decoration-none fw-bold" style={{ color: '#764ba2', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>Register</button>
           </p>
         </div>
       </div>

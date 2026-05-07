@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'https://localhost:44365/graphql';
+export const API_BASE_URL = 'https://learn-web-app-d8g6dvb9bwcadcgj.centralindia-01.azurewebsites.net/graphql';
