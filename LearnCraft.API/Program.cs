@@ -54,9 +54,6 @@ builder.Services
     .AddAuthorization();
 
 // Database
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 
@@ -187,11 +184,21 @@ app.MapGraphQL("/graphql").WithOptions(new GraphQLServerOptions
 
 try
 {
+    AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+    {
+        Log.Logger.Fatal(eventArgs.ExceptionObject as Exception, "A fatal unhandled exception occurred.");
+    };
+    TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
+    {
+        Log.Logger.Error(eventArgs.Exception, "An unobserved task exception occurred.");
+        eventArgs.SetObserved();
+    };
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Logger.Error(ex, "Unhandled exception occurred while running the application.");
+    Log.Logger.Fatal(ex, "Unhandled exception occurred while running the application.");
+    throw;
 }
 
 
